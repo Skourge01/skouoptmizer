@@ -76,11 +76,22 @@ instalar_dependencias_graficas() {
             ;;
     esac
 }
-configurar_variaveis_gl() {
+verificar_e_adicionar_variaveis_gl() {
+    # Verifica se todas as variáveis já estão no arquivo
+    if grep -q "__GL_THREADED_OPTIMIZATIONS=1" /etc/environment && \
+       grep -q "__GL_MaxFramesAllowed=1" /etc/environment && \
+       grep -q '__GL_YIELD="USLEEP"' /etc/environment && \
+       grep -q "__GL_SHADER_DISK_CACHE_SKIP_CLEANUP=1" /etc/environment && \
+       grep -q "__GL_SYNC_DISPLAY_DEVICE=" /etc/environment; then
+        echo "As variáveis de ambiente já estão configuradas."
+        return
+    fi
+
+    # Se não estiverem, perguntar se deseja adicionar
     read -p "Deseja adicionar as variáveis de ambiente para otimização gráfica? (sim/nao): " resposta
     if [[ "$resposta" == "sim" ]]; then
         echo "Adicionando variáveis ao /etc/environment..."
-        
+
         sudo bash -c 'cat << EOF >> /etc/environment
 __GL_THREADED_OPTIMIZATIONS=1
 __GL_MaxFramesAllowed=1
@@ -103,5 +114,6 @@ EOF'
         echo "As variáveis de ambiente não foram adicionadas."
     fi
 }
+verificar_e_adicionar_variaveis_gl
 
 
