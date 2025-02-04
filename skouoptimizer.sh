@@ -409,4 +409,3 @@ iniciar_verificador(){
         echo "Erro: ~/skouoptmizer/verificador.sh não encontrado."
     fi
 }
-
