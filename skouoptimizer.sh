@@ -2,6 +2,14 @@
 #skouoptmizer vai dizer sim ou nao para as otimizacoes mais rapidas do sistema, o verdadeiro archlinux 
 # primeiro, perguntar se desejo ativar o multilib, caso ja estiver ativo, ele nem faz a pergunta
 #!/bin/bash
+verificar_figlet(){
+    if command -v figlet &> /dev/null;then 
+        
+    else
+        sudo pacman -S figlet
+}
+verificar_figlet
+figlet skouoptmizer
 ativar_multilib() {
     sudo sed -i '/\[multilib\]/,/^$/s/^#//g' /etc/pacman.conf
     sudo pacman -Sy
@@ -267,4 +275,129 @@ verificar_e_configurar_aparar() {
     fi
 }
 verificar_e_configurar_aparar
+verificar_e_ativar_irqbalance() {
+    # Verificar se o serviço irqbalance está em execução
+    if systemctl is-active --quiet irqbalance; then
+        echo "irqbalance já está em execução."
+        return
+    fi
+    
+    # Perguntar ao usuário se deseja ativar o irqbalance
+    read -p "O serviço irqbalance não está em execução. Deseja ativá-lo? (s/n) " resposta
+    if [[ "$resposta" =~ ^[Ss]$ ]]; then
+        sudo pacman -S irqbalance
+        sudo systemctl enable --now irqbalance
+        echo "irqbalance foi instalado e ativado com sucesso."
+    else
+        echo "Operação cancelada. irqbalance não foi ativado."
+    fi
+}
+verificar_e_ativar_irqbalance
+instalar_pipewire() {
+    # Perguntar ao usuário se deseja instalar o Pipewire
+    read -p "Deseja instalar o Pipewire e seus componentes adicionais? (s/n) " resposta
+    if [[ "$resposta" =~ ^[Ss]$ ]]; then
+        # Instalar os pacotes do Pipewire e seus componentes adicionais
+        sudo pacman -S pipewire-jack lib32-pipewire gst-plugin-pipewire realtime-privileges rtkit
+
+        # Ativar os serviços necessários do Pipewire
+        systemctl --user enable --now pipewire pipewire-pulse wireplumber
+
+        # Adicionar o usuário ao grupo realtime
+        sudo usermod -aG realtime "$USER"
+
+        echo "Pipewire e seus componentes foram instalados e configurados com sucesso."
+    else
+        echo "Operação cancelada. Pipewire não foi instalado."
+    fi
+}
+instalar_pipewire
+configurar_pipewire() {
+    # Verificar se o diretório existe
+    if [ ! -d "$HOME/.config/pipewire/pipewire.conf.d" ]; then
+        mkdir -p "$HOME/.config/pipewire/pipewire.conf.d"
+    fi
+
+    # Caminho do arquivo de configuração
+    conf_file="$HOME/.config/pipewire/pipewire.conf.d/10-no-resampling.conf"
+
+    # Verificar se o arquivo de configuração já existe e contém as propriedades necessárias
+    if grep -q "default.clock.rate = 48000" "$conf_file" && grep -q "default.clock.allowed-rates = \[ 44100 48000 96000 192000 \]" "$conf_file"; then
+        echo "As configurações de qualidade do Pipewire já estão aplicadas. Nenhuma alteração será feita."
+    else
+        # Perguntar ao usuário se deseja melhorar a qualidade do Pipewire
+        read -p "Deseja melhorar a qualidade do som do Pipewire? (s/n) " resposta
+        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+            # Adicionar as configurações ao arquivo
+            echo -e "context.properties = {\n   default.clock.rate = 48000\n   default.clock.allowed-rates = [ 44100 48000 96000 192000 ]\n}" > "$conf_file"
+
+            echo "Configurações de qualidade do Pipewire aplicadas com sucesso."
+        else
+            echo "Operação cancelada. O Pipewire não foi configurado."
+        fi
+    fi
+}
+configurar_pipewire
+configurar_mistura_estereo_51() {
+    # Diretórios e arquivos de configuração
+    pulse_conf_dir="$HOME/.config/pipewire/pipewire-pulse.conf.d"
+    rt_conf_dir="$HOME/.config/pipewire/client-rt.conf.d"
+    upmix_conf_file="$HOME/.config/pipewire/pipewire-pulse.conf.d/20-upmix.conf"
+    rt_upmix_conf_file="$HOME/.config/pipewire/client-rt.conf.d/20-upmix.conf"
+
+    # Verificar se os arquivos de configuração já existem
+    if [ -f "$upmix_conf_file" ] && [ -f "$rt_upmix_conf_file" ]; then
+        echo "Mistura estéreo 5.1 já está configurada."
+    else
+        # Perguntar ao usuário se deseja configurar
+        read -p "Deseja configurar a mistura estéreo para 5.1? (s/n) " resposta
+        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+            # Criar diretórios, caso não existam
+            mkdir -p "$pulse_conf_dir" "$rt_conf_dir"
+
+            # Copiar os arquivos de configuração para os diretórios adequados
+            sudo cp /usr/share/pipewire/client-rt.conf.avail/20-upmix.conf "$pulse_conf_dir"
+            sudo cp /usr/share/pipewire/client-rt.conf.avail/20-upmix.conf "$rt_conf_dir"
+
+            echo "Mistura estéreo para 5.1 configurada com sucesso."
+        else
+            echo "Operação cancelada. Mistura estéreo 5.1 não foi configurada."
+        fi
+    fi
+}
+configurar_mistura_estereo_51
+configurar_correção_chiado() {
+    # Caminho para o arquivo de configuração
+    conf_file="$HOME/.config/pipewire/pipewire.conf.d/10-sound.conf"
+
+    # Verificar se o arquivo já contém as configurações necessárias
+    if grep -q "default.clock.quantum = 4096" "$conf_file"; then
+        echo "A correção de chiado em carga já está configurada."
+    else
+        # Perguntar ao usuário se deseja configurar
+        read -p "Deseja corrigir o chiado em carga ajustando o buffer do Pipewire? (s/n) " resposta
+        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+            # Criar diretório se não existir
+            mkdir -p "$HOME/.config/pipewire/pipewire.conf.d"
+
+            # Criar ou editar o arquivo com as configurações necessárias
+            cat <<EOF > "$conf_file"
+context.properties = {
+    default.clock.rate = 48000
+    default.clock.allowed-rates = [ 44100 48000 88200 96000 ]
+    default.clock.min-quantum = 512
+    default.clock.quantum = 4096
+    default.clock.max-quantum = 8192
+}
+EOF
+
+            echo "Correção de chiado em carga configurada com sucesso."
+        else
+            echo "Operação cancelada. Correção de chiado em carga não foi configurada."
+        fi
+    fi
+}
+configurar_correção_chiado
+
+
 
