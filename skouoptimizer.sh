@@ -3,13 +3,13 @@
 # primeiro, perguntar se desejo ativar o multilib, caso ja estiver ativo, ele nem faz a pergunta
 #!/bin/bash
 verificar_figlet(){
-    if command -v figlet &> /dev/null;then 
-        
-    else
-        sudo pacman -S figlet
+    if ! command -v figlet &> /dev/null; then
+        sudo pacman -S --noconfirm figlet &> /dev/null
+    fi
 }
+
 verificar_figlet
-figlet skouoptmizer
+figlet Skouoptmizer
 ativar_multilib() {
     sudo sed -i '/\[multilib\]/,/^$/s/^#//g' /etc/pacman.conf
     sudo pacman -Sy
