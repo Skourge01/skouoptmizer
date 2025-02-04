@@ -84,6 +84,7 @@ instalar_dependencias_graficas() {
             ;;
     esac
 }
+instalar_dependencias_graficas
 verificar_e_adicionar_variaveis_gl() {
     # Verifica se todas as variáveis já estão no arquivo
     if grep -q "__GL_THREADED_OPTIMIZATIONS=1" /etc/environment && \
@@ -398,6 +399,14 @@ EOF
     fi
 }
 configurar_correção_chiado
-
-
+sudo pacman -Rns figlet
+iniciar_verificador(){
+    echo "Iniciando o verificador global"
+    
+    if [[ -f ~/skouoptmizer/verificador.sh ]]; then
+        ~/skouoptmizer/verificador.sh
+    else
+        echo "Erro: ~/skouoptmizer/verificador.sh não encontrado."
+    fi
+}
 
