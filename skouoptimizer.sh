@@ -7,33 +7,30 @@ verificar_figlet(){
         sudo pacman -S --noconfirm figlet &> /dev/null
     fi
 }
-
 verificar_figlet
 figlet Skouoptmizer
+
 ativar_multilib() {
-    sudo sed -i '/\[multilib\]/,/^$/s/^#//g' /etc/pacman.conf
-    sudo pacman -Sy
-    echo "Repositório multilib ativado com sucesso!"
-}
-multilib_esta_ativo() {
-    grep -q '^\[multilib\]' /etc/pacman.conf && \
-    grep -q 'Include = /etc/pacman.d/mirrorlist' /etc/pacman.conf
-}
-if ! multilib_esta_ativo; then
-    read -p "Deseja ativar o repositório multilib? (sim/nao): " resposta
-    if [[ "$resposta" == "sim" ]]; then
-        ativar_multilib
+    if [[ -x "./multilib.sh" ]]; then
+        echo "Executando o script multilib.sh..."
+        ./multilib.sh
     else
-        echo "Repositório multilib não foi ativado."
+        echo "O script multilib.sh não foi encontrado ou não tem permissão de execução."
     fi
-else
-    echo "O repositório multilib já está ativado."
-fi
+}
+
 verificar_reflector_rsync() {
+    if ! command -v reflector &> /dev/null; then
+        echo "O pacote 'reflector' não está instalado."
+    fi
+# duas funções de verificação de: reflector, e rsync
+    if ! command -v rsync &> /dev/null; then
+        echo "O pacote 'rsync' não está instalado."
+    fi
+
     if ! command -v reflector &> /dev/null || ! command -v rsync &> /dev/null; then
-        echo "O reflector ou rsync não estão instalados no sistema."
-        read -p "Deseja instalar e habilitar a aceleração da atualização do sistema? (sim/nao): " resposta
-        if [[ "$resposta" == "sim" ]]; then
+        read -r -p "Deseja instalar e habilitar a aceleração da atualização do sistema? (S/N): " resposta
+        if [[ "$resposta" =~ ^[Ss]$ ]]; then # antes era ultilizado Sim/Não, agora e Ss/Nn 
             acelerar_atualizacao
         else
             echo "Aceleração da atualização não será habilitada."
@@ -43,19 +40,15 @@ verificar_reflector_rsync() {
     fi
 }
 acelerar_atualizacao() {
-    read -p "Deseja habilitar a aceleração da atualização do sistema? (sim/nao): " resposta
-    if [[ "$resposta" == "sim" ]]; then
-        echo "Instalando o reflector e rsync..."
-        sudo pacman -S --noconfirm reflector rsync
-        read -p "Digite o nome do país para selecionar os espelhos mais rápidos (ex: Germany, Russia, etc.): " pais
-        echo "Classificando os espelhos mais rápidos de $pais..."
-        sudo reflector --verbose --country "$pais" -l 25 --sort rate --save /etc/pacman.d/mirrorlist
-        sudo pacman -Sy
+    echo "Instalando o reflector e rsync..."
+    sudo pacman -S --noconfirm reflector rsync
 
-        echo "Espelhos atualizados para $pais com sucesso!"
-    else
-        echo "Aceleração da atualização do sistema não foi habilitada."
-    fi
+    read -r -p "Digite o nome do país para selecionar os espelhos mais rápidos (ex: Germany, Brazil, etc.): " pais
+    echo "Classificando os espelhos mais rápidos de $pais..."
+    sudo reflector --verbose --country "$pais" -l 25 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+    sudo pacman -Sy
+
+    echo "Espelhos atualizados para $pais com sucesso!"
 }
 verificar_reflector_rsync
 # Função para instalar dependências de placas gráficas
