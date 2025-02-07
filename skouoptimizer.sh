@@ -39,7 +39,7 @@ executar_graphicaldependences() {
         echo "O script graphicaldependences.sh não foi encontrado."
     fi
 }
-
+executar_graphicaldependences
 executar_glvariables() {
     local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/glvariables.sh"
 
@@ -49,122 +49,50 @@ executar_glvariables() {
         echo "O script glbariables.sh não foi encontrado."
     fi
 }
+executar_glvariables
+executar_initramfs_lz4() {
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/initramfs_lz4.sh"
 
-
-
-verificar_e_perguntar_initramfs_lz4() {
-    if grep -q '^COMPRESSION="lz4"' /etc/mkinitcpio.conf && grep -q '^COMPRESSION_OPTIONS=(-9)' /etc/mkinitcpio.conf; then
-        echo "A compressão do initramfs já está configurada corretamente para lz4 (-9). Nenhuma alteração necessária."
-        return
-    fi
-
-    read -p "A compressão do initramfs não está configurada para lz4 (-9). Deseja configurar agora? (s/n) " resposta
-    if [[ "$resposta" =~ ^[Ss]$ ]]; then
-        echo "Configurando o mkinitcpio para usar lz4..."
-        
-        # Substitui ou adiciona as configurações de compressão
-        sudo sed -i 's/^COMPRESSION=.*/COMPRESSION="lz4"/' /etc/mkinitcpio.conf
-        sudo sed -i 's/^COMPRESSION_OPTIONS=.*/COMPRESSION_OPTIONS=(-9)/' /etc/mkinitcpio.conf
-
-        # Caso as linhas não existam, adiciona ao final do arquivo
-        if ! grep -q '^COMPRESSION="lz4"' /etc/mkinitcpio.conf; then
-            echo 'COMPRESSION="lz4"' | sudo tee -a /etc/mkinitcpio.conf > /dev/null
-        fi
-        if ! grep -q '^COMPRESSION_OPTIONS=(-9)' /etc/mkinitcpio.conf; then
-            echo 'COMPRESSION_OPTIONS=(-9)' | sudo tee -a /etc/mkinitcpio.conf > /dev/null
-        fi
-
-        echo "Atualizando initramfs..."
-        sudo mkinitcpio -P
-
-        echo "Configuração concluída!"
+    if [[ -f "$script_path" ]]; then
+        bash "$script_path"
     else
-        echo "Configuração não aplicada."
+        echo "O script initramfs_lz4.sh não foi encontrado."
     fi
 }
-verificar_e_perguntar_initramfs_lz4 
-verificar_e_perguntar_systemd_initramfs() {
-    if grep -q '^HOOKS=(.*systemd.*)' /etc/mkinitcpio.conf; then
-        echo "O Systemd já está configurado no initramfs. Nenhuma alteração necessária."
-        return
-    fi
+executar_initramfs_lz4
+executar_systemd_initramfs() {
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/systemd_initramfs.sh"
 
-    read -p "O Systemd não está configurado no initramfs. Deseja configurar agora? (s/n) " resposta
-    if [[ "$resposta" =~ ^[Ss]$ ]]; then
-        echo "Configurando o mkinitcpio para usar o Systemd..."
-
-        # Substitui HOOKS pelo novo valor
-        sudo sed -i 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode modconf kms keyboard sd-vconsole block filesystems fsck)/' /etc/mkinitcpio.conf
-
-        echo "Atualizando initramfs..."
-        sudo mkinitcpio -P
-
-        echo "Configuração concluída!"
+    if [[ -f "$script_path" ]]; then
+        bash "$script_path"
     else
-        echo "Configuração não aplicada."
+        echo "O script systemd_initramfs.sh não foi encontrado."
     fi
 }
-verificar_e_perguntar_systemd_initramfs 
-ativar_systemd_oomd() {
-    # Verifica se o systemd-oomd já está ativo
-    if systemctl is-active --quiet systemd-oomd; then
-        echo "systemd-oomd já está ativo."
-        return
-    fi
+executar_systemd_initramfs
 
-    # Pergunta se o usuário deseja ativar o systemd-oomd
-    read -p "Deseja ativar o systemd-oomd? (s/n) " resposta
-    if [[ "$resposta" =~ ^[Ss]$ ]]; then
-        sudo systemctl enable --now systemd-oomd
-        echo "systemd-oomd ativado com sucesso."
+executar_systemd_oomd() {
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/systemd_oomd.sh"
+
+    if [[ -f "$script_path" ]]; then
+        bash "$script_path"
     else
-        echo "Operação cancelada."
+        echo "O script systemd_oomd.sh não foi encontrado."
     fi
 }
-ativar_systemd_oomd 
-instalar_ananicy_cpp() {
-    # Verifica se o ananicy-cpp está instalado
-    if pacman -Qs ananicy-cpp > /dev/null; then
-        echo "ananicy-cpp já está instalado."
-    else
-        # Pergunta ao usuário se deseja instalar o ananicy-cpp
-        read -p "Deseja instalar o ananicy-cpp? (s/n) " resposta
-        if [[ "$resposta" =~ ^[Ss]$ ]]; then
-            sudo pacman -S ananicy-cpp
-            echo "ananicy-cpp instalado com sucesso."
-        else
-            echo "Operação cancelada."
-            return
-        fi
-    fi
+executar_systemd_oomd
+executar_ananicy_cpp() {
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/ananicy_cpp.sh"
 
-    # Verifica se o serviço ananicy-cpp está ativo
-    if systemctl is-active --quiet ananicy-cpp; then
-        echo "O serviço ananicy-cpp já está ativo."
+    if [[ -f "$script_path" ]]; then
+        bash "$script_path"
     else
-        # Pergunta ao usuário se deseja ativar o serviço
-        read -p "Deseja ativar o serviço ananicy-cpp? (s/n) " resposta
-        if [[ "$resposta" =~ ^[Ss]$ ]]; then
-            sudo systemctl enable --now ananicy-cpp
-            echo "O serviço ananicy-cpp foi ativado com sucesso."
-        else
-            echo "Operação cancelada."
-        fi
-    fi
-
-    # Instalando as regras adicionais
-    read -p "Deseja instalar as regras adicionais do ananicy-cpp? (s/n) " resposta
-    if [[ "$resposta" =~ ^[Ss]$ ]]; then
-        git clone https://aur.archlinux.org/cachyos-ananicy-rules-git.git
-        cd cachyos-ananicy-rules-git
-        makepkg -sric
-        sudo systemctl restart ananicy-cpp
-        echo "Regras adicionais do ananicy-cpp instaladas e serviço reiniciado."
-    else
-        echo "Operação cancelada."
+        echo "O script ananicy_cpp.sh não foi encontrado."
     fi
 }
-instalar_ananicy_cpp
+executar_ananicy_cpp
+
+
 verificar_e_configurar_aparar() {
     # Verificar se o sistema de arquivos BTRFS NÃO está em uso
     if lsblk -f | grep -q 'btrfs'; then
