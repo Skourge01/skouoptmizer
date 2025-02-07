@@ -1,46 +1,71 @@
 #!/bin/bash
 instalar_pipewire() {
-    # Perguntar ao usuário se deseja instalar o Pipewire
-    read -p "Deseja instalar o Pipewire e seus componentes adicionais? (s/n) " resposta
-    if [[ "$resposta" =~ ^[Ss]$ ]]; then
-        # Instalar os pacotes do Pipewire e seus componentes adicionais
-        sudo pacman -S pipewire-jack lib32-pipewire gst-plugin-pipewire realtime-privileges rtkit
-
-        # Ativar os serviços necessários do Pipewire
-        systemctl --user enable --now pipewire pipewire-pulse wireplumber
-
-        # Adicionar o usuário ao grupo realtime
-        sudo usermod -aG realtime "$USER"
-
-        echo "Pipewire e seus componentes foram instalados e configurados com sucesso."
+    # Verifica se os pacotes já estão instalados
+    if pacman -Qs pipewire-jack lib32-pipewire gst-plugin-pipewire realtime-privileges rtkit > /dev/null; then
+        echo "Pipewire e seus componentes já estão instalados."
     else
-        echo "Operação cancelada. Pipewire não foi instalado."
-    fi
-}
-instalar_pipewire
-configurar_pipewire() {
-    # Verificar se o diretório existe
-    if [ ! -d "$HOME/.config/pipewire/pipewire.conf.d" ]; then
-        mkdir -p "$HOME/.config/pipewire/pipewire.conf.d"
-    fi
-
-    # Caminho do arquivo de configuração
-    conf_file="$HOME/.config/pipewire/pipewire.conf.d/10-no-resampling.conf"
-
-    # Verificar se o arquivo de configuração já existe e contém as propriedades necessárias
-    if grep -q "default.clock.rate = 48000" "$conf_file" && grep -q "default.clock.allowed-rates = \[ 44100 48000 96000 192000 \]" "$conf_file"; then
-        echo "As configurações de qualidade do Pipewire já estão aplicadas. Nenhuma alteração será feita."
-    else
-        # Perguntar ao usuário se deseja melhorar a qualidade do Pipewire
-        read -p "Deseja melhorar a qualidade do som do Pipewire? (s/n) " resposta
+        read -p "Deseja instalar o Pipewire e seus componentes adicionais? (s/n) " resposta
         if [[ "$resposta" =~ ^[Ss]$ ]]; then
-            # Adicionar as configurações ao arquivo
-            echo -e "context.properties = {\n   default.clock.rate = 48000\n   default.clock.allowed-rates = [ 44100 48000 96000 192000 ]\n}" > "$conf_file"
-
-            echo "Configurações de qualidade do Pipewire aplicadas com sucesso."
+            sudo pacman -S pipewire-jack lib32-pipewire gst-plugin-pipewire realtime-privileges rtkit
+            echo "Pipewire e seus componentes foram instalados com sucesso."
         else
-            echo "Operação cancelada. O Pipewire não foi configurado."
+            echo "Operação cancelada."
+            return
+        fi
+    fi
+
+    # Verifica se os serviços já estão ativos e habilitados
+    if systemctl --user is-enabled --quiet pipewire && systemctl --user is-active --quiet pipewire && \
+       systemctl --user is-enabled --quiet pipewire-pulse && systemctl --user is-active --quiet pipewire-pulse && \
+       systemctl --user is-enabled --quiet wireplumber && systemctl --user is-active --quiet wireplumber; then
+        echo "Os serviços do Pipewire já estão ativos e habilitados."
+    else
+        read -p "Deseja ativar os serviços do Pipewire? (s/n) " resposta
+        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+            systemctl --user enable --now pipewire pipewire-pulse wireplumber
+            echo "Serviços do Pipewire ativados."
+        else
+            echo "Operação cancelada."
+        fi
+    fi
+
+    # Verifica se o usuário já está no grupo realtime
+    if groups "$USER" | grep -qw "realtime"; then
+        echo "O usuário já faz parte do grupo realtime."
+    else
+        read -p "Deseja adicionar o usuário ao grupo realtime para melhor desempenho? (s/n) " resposta
+        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+            sudo usermod -aG realtime "$USER"
+            echo "Usuário adicionado ao grupo realtime. Faça logout ou reinicie para aplicar as mudanças."
+        else
+            echo "Operação cancelada."
         fi
     fi
 }
+
+configurar_pipewire() {
+    # Diretório e caminho do arquivo de configuração
+    conf_dir="$HOME/.config/pipewire/pipewire.conf.d"
+    conf_file="$conf_dir/10-no-resampling.conf"
+
+    # Criar diretório caso não exista
+    if [ ! -d "$conf_dir" ]; then
+        mkdir -p "$conf_dir"
+    fi
+
+    # Verifica se o arquivo de configuração já contém as propriedades corretas
+    if [ -f "$conf_file" ] && grep -q "default.clock.rate = 48000" "$conf_file" && grep -q "default.clock.allowed-rates = \[ 44100 48000 96000 192000 \]" "$conf_file"; then
+        echo "As configurações do Pipewire já estão aplicadas."
+    else
+        read -p "Deseja melhorar a qualidade do som do Pipewire? (s/n) " resposta
+        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+            echo -e "context.properties = {\n   default.clock.rate = 48000\n   default.clock.allowed-rates = [ 44100 48000 96000 192000 ]\n}" > "$conf_file"
+            echo "Configurações de qualidade do Pipewire aplicadas."
+        else
+            echo "Operação cancelada."
+        fi
+    fi
+}
+
+instalar_pipewire
 configurar_pipewire
