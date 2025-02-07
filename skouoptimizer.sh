@@ -10,74 +10,35 @@ verificar_figlet(){
 verificar_figlet
 figlet Skouoptmizer
 
-ativar_multilib() {
-    if [[ -x "./multilib.sh" ]]; then
-        echo "Executando o script multilib.sh..."
-        ./multilib.sh
+executar_multilib() {
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/multilib.sh"
+
+    if [[ -f "$script_path" ]]; then
+        bash "$script_path"
     else
-        echo "O script multilib.sh não foi encontrado ou não tem permissão de execução."
+        echo "O script multilib.sh não foi encontrado."
     fi
 }
 
-verificar_reflector_rsync() {
-    if ! command -v reflector &> /dev/null; then
-        echo "O pacote 'reflector' não está instalado."
-    fi
-# duas funções de verificação de: reflector, e rsync
-    if ! command -v rsync &> /dev/null; then
-        echo "O pacote 'rsync' não está instalado."
-    fi
+executar_reflectorsync() {
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/reflectorsync.sh"
 
-    if ! command -v reflector &> /dev/null || ! command -v rsync &> /dev/null; then
-        read -r -p "Deseja instalar e habilitar a aceleração da atualização do sistema? (S/N): " resposta
-        if [[ "$resposta" =~ ^[Ss]$ ]]; then # antes era ultilizado Sim/Não, agora e Ss/Nn 
-            acelerar_atualizacao
-        else
-            echo "Aceleração da atualização não será habilitada."
-        fi
+    if [[ -f "$script_path" ]]; then
+        bash "$script_path"
     else
-        echo "A aceleração do sistema já está habilitada."
+        echo "O script reflectorsync.sh não foi encontrado."
     fi
 }
-acelerar_atualizacao() {
-    echo "Instalando o reflector e rsync..."
-    sudo pacman -S --noconfirm reflector rsync
 
-    read -r -p "Digite o nome do país para selecionar os espelhos mais rápidos (ex: Germany, Brazil, etc.): " pais
-    echo "Classificando os espelhos mais rápidos de $pais..."
-    sudo reflector --verbose --country "$pais" -l 25 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
-    sudo pacman -Sy
+executar_graphicaldependences() {
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/graphicaldependences.sh"
 
-    echo "Espelhos atualizados para $pais com sucesso!"
+    if [[ -f "$script_path" ]]; then
+        bash "$script_path"
+    else
+        echo "O script graphicaldependences.sh não foi encontrado."
+    fi
 }
-verificar_reflector_rsync
-# Função para instalar dependências de placas gráficas
-instalar_dependencias_graficas() {
-    echo "Escolha a placa gráfica para instalar as dependências:"
-    echo "1. Intel"
-    echo "2. AMD"
-    echo "3. NVIDIA"
-    read -p "Digite o número da opção desejada (1/2/3): " opcao
-
-    case $opcao in
-        1)
-            echo "Instalando dependências para Intel..."
-            sudo pacman -S mesa lib32-mesa vulkan-intel lib32-vulkan-intel opencl-rusticl-mesa lib32-opencl-rusticl-mesa
-            ;;
-        2)
-            echo "Instalando dependências para AMD..."
-            sudo pacman -S mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon vulkan-mesa-layers opencl-rusticl-mesa lib32-opencl-rusticl-mesa
-            ;;
-        3)
-            echo "Instalando dependências para NVIDIA..."
-            sudo pacman -S nvidia-open-dkms nvidia-utils lib32-nvidia-utils nvidia-settings lib32-opencl-nvidia opencl-nvidia libxnvctrl lib32-vulkan-icd-loader libva-nvidia-driver
-            ;;
-        *)
-            echo "Opção inválida. Nenhuma dependência instalada."
-            ;;
-    esac
-}
-instalar_dependencias_graficas
 verificar_e_adicionar_variaveis_gl() {
     # Verifica se todas as variáveis já estão no arquivo
     if grep -q "__GL_THREADED_OPTIMIZATIONS=1" /etc/environment && \
