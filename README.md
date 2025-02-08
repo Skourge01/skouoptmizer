@@ -16,6 +16,10 @@ which are
 - stereo_mix_51
 - systemd_initramfs
 - trim
+## Another warning:
+- everything listed will be activated with s/n and a check, so it is up to the user to decide whether to activate it or not
+- I recommend that you see what each optimization does before wanting to activate them (check the source code for this)
+
 ## for debian
 - still in development but most of the optimizations I'm doing
 ### Activation rules
