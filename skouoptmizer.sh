@@ -4,12 +4,14 @@ detect_distro_and_run() {
         . /etc/os-release
         distro=${ID:-$ID_LIKE}  # Usa ID, mas se não existir, tenta ID_LIKE
 
+        script_dir="$(dirname "$(realpath "$0")")"  # Obtém o diretório do script
+
         case "$distro" in
             arch)
-                /scripts/arch/arch.sh
+                bash "$script_dir/scripts/arch/arch.sh"
                 ;;
             debian)
-                /scripts/debian/debian.sh
+                bash "$script_dir/scripts/debian/debian.sh"
                 ;;
             *)
                 echo "Distro não suportada: $distro"

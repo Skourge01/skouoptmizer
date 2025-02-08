@@ -1,19 +1,40 @@
 #!/bin/bash
-#skouoptmizer vai dizer sim ou nao para as otimizacoes mais rapidas do sistema, o verdadeiro debian
-verificar_figlet(){
+# skouoptmizer vai dizer sim ou não para as otimizações mais rápidas do sistema, o verdadeiro Debian.
+
+# Função para verificar e instalar o figlet, se necessário
+verificar_figlet() {
     if ! command -v figlet &> /dev/null; then
-        sudo apt install figlet &> /dev/null
+        echo "Instalando figlet..."
+        sudo apt install figlet -y
     fi
 }
-verificar_figlet
-figlet skouoptmizer
-executar_graphicaldependences() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/debian/(deb)graphicaldependences.sh"
 
+executar_graphicaldependences() {
+    # Obtém o diretório do script atual
+    local script_dir="$(dirname "$(readlink -f "$0")")"
+    # Define o caminho para o script do Debian
+    local script_path="${script_dir}/graphicaldependences.sh"
+
+    # Verifica se o script existe
     if [[ -f "$script_path" ]]; then
+        echo "Executando o script graphicaldependences.sh ..."
         bash "$script_path"
     else
-        echo "O script (deb)graphicaldependences.sh não foi encontrado."
+        echo "Erro: O script graphicaldependences.sh  não foi encontrado em $script_path."
     fi
 }
 executar_graphicaldependences
+executar_glvariables() {
+    # Obtém o diretório do script atual
+    local script_dir="$(dirname "$(readlink -f "$0")")"
+    # Define o caminho para o script do Debian
+    local script_path="${script_dir}/glvariables.sh"
+
+    if [[ -f "$script_path" ]]; then
+        echo "Executando o script glvariables.sh do Debian..."
+        bash "$script_path"
+    else
+        echo "Erro: O script glvariables.sh do Debian não foi encontrado em $script_path."
+    fi
+}
+executar_glvariables
