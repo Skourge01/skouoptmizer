@@ -32,7 +32,7 @@ warning: check the approved distros
 - swapfile (unlikely)
 ## Approved and supported distros
 arch (native)
-debian (testing)
+debian (unlikely)
 ## Optimization information:
 check: https://ventureo.codeberg.page/source/services.html
 
