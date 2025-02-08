@@ -108,4 +108,17 @@ executar_trim() {
     fi
 }
 executar_trim
+executar_irqbalance() {
+    # Obtém o diretório do script atual
+    local script_dir="$(dirname "$(readlink -f "$0")")"
+    # Define o caminho para o script do Debian
+    local script_path="${script_dir}/irqbalance.sh"
 
+    if [[ -f "$script_path" ]]; then
+        echo "Executando o script irqbalance Debian..."
+        bash "$script_path"
+    else
+        echo "Erro: O script irqbalance  não foi encontrado em $script_path."
+    fi
+}
+executar_irqbalance
