@@ -94,4 +94,18 @@ executar_ananicy_cpp() {
     fi
 }
 executar_ananicy_cpp
+executar_trim() {
+    # Obtém o diretório do script atual
+    local script_dir="$(dirname "$(readlink -f "$0")")"
+    # Define o caminho para o script do Debian
+    local script_path="${script_dir}/trim.sh"
+
+    if [[ -f "$script_path" ]]; then
+        echo "Executando o script trim.sh Debian..."
+        bash "$script_path"
+    else
+        echo "Erro: O script trim.sh  não foi encontrado em $script_path."
+    fi
+}
+executar_trim
 
