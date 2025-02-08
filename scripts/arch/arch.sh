@@ -1,7 +1,5 @@
 #!/bin/bash
 #skouoptmizer vai dizer sim ou nao para as otimizacoes mais rapidas do sistema, o verdadeiro archlinux 
-# primeiro, perguntar se desejo ativar o multilib, caso ja estiver ativo, ele nem faz a pergunta
-#!/bin/bash
 verificar_figlet(){
     if ! command -v figlet &> /dev/null; then
         sudo pacman -S --noconfirm figlet &> /dev/null
@@ -10,7 +8,7 @@ verificar_figlet(){
 verificar_figlet
 figlet Skouoptmizer
 executar_multilib() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/multilib.sh"
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/arch/multilib.sh"
 
     if [[ -f "$script_path" ]]; then
         bash "$script_path"
@@ -20,7 +18,7 @@ executar_multilib() {
 }
 executar_multilib
 executar_reflectorsync() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/reflectorsync.sh"
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/arch/reflectorsync.sh"
 
     if [[ -f "$script_path" ]]; then
         bash "$script_path"
@@ -30,7 +28,7 @@ executar_reflectorsync() {
 }
 executar_reflectorsync
 executar_graphicaldependences() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/graphicaldependences.sh"
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/arch/graphicaldependences.sh"
 
     if [[ -f "$script_path" ]]; then
         bash "$script_path"
@@ -40,7 +38,7 @@ executar_graphicaldependences() {
 }
 executar_graphicaldependences
 executar_glvariables() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/glvariables.sh"
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/arch/glvariables.sh"
 
     if [[ -f "$script_path" ]]; then
         bash "$script_path"
@@ -50,7 +48,7 @@ executar_glvariables() {
 }
 executar_glvariables
 executar_initramfs_lz4() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/initramfs_lz4.sh"
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/arch/initramfs_lz4.sh"
 
     if [[ -f "$script_path" ]]; then
         bash "$script_path"
@@ -60,7 +58,7 @@ executar_initramfs_lz4() {
 }
 executar_initramfs_lz4
 executar_systemd_initramfs() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/systemd_initramfs.sh"
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/arch/systemd_initramfs.sh"
 
     if [[ -f "$script_path" ]]; then
         bash "$script_path"
@@ -70,7 +68,7 @@ executar_systemd_initramfs() {
 }
 executar_systemd_initramfs
 executar_systemd_oomd() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/systemd_oomd.sh"
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/arch/systemd_oomd.sh"
 
     if [[ -f "$script_path" ]]; then
         bash "$script_path"
@@ -80,7 +78,7 @@ executar_systemd_oomd() {
 }
 executar_systemd_oomd
 executar_ananicy_cpp() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/ananicy_cpp.sh"
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/arch/ananicy_cpp.sh"
 
     if [[ -f "$script_path" ]]; then
         bash "$script_path"
@@ -90,7 +88,7 @@ executar_ananicy_cpp() {
 }
 executar_ananicy_cpp
 executar_trim() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/trim.sh"
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/arch/trim.sh"
 
     if [[ -f "$script_path" ]]; then
         bash "$script_path"
@@ -100,17 +98,17 @@ executar_trim() {
 }
 executar_trim
 executar_irqbalance() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/irqbalance.sh"
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/arch/irqbalance.sh"
 
     if [[ -f "$script_path" ]]; then
         bash "$script_path"
     else
-        echo "O script trim.sh não foi encontrado."
+        echo "O script irqbalance.sh não foi encontrado."
     fi
 }
 executar_irqbalance
 executar_pipewire() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/pipewire.sh"
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/arch/pipewire.sh"
 
     if [[ -f "$script_path" ]]; then
         bash "$script_path"
@@ -120,12 +118,12 @@ executar_pipewire() {
 }
 executar_pipewire
 executar_stereo_mix_51() {
-    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/stereo_mix_51.sh"
+    local script_path="$(dirname "${BASH_SOURCE[0]}")/scripts/arch/stereo_mix_51.sh"
 
     if [[ -f "$script_path" ]]; then
         bash "$script_path"
     else
-        echo "O script pipewire.sh não foi encontrado."
+        echo "O script sterep_mix_51.sh não foi encontrado."
     fi
 }
 executar_stereo_mix_51

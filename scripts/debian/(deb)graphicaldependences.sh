@@ -1,0 +1,44 @@
+#!/bin/bash
+instalar_dependencias_graficas() {
+    echo "Escolha a placa gráfica para instalar as dependências:"
+    echo "1. Intel"
+    echo "2. AMD"
+    echo "3. NVIDIA"
+    read -p "Digite o número da opção desejada (1/2/3): " opcao
+
+    case $opcao in
+        1)
+            echo "Verificando dependências para Intel..."
+            pacotes=("mesa-utils" "intel-media-va-driver" "i965-va-driver" "vainfo")
+            ;;
+        2)
+            echo "Verificando dependências para AMD..."
+            pacotes=("mesa-utils" "firmware-amd-graphics" "xserver-xorg-video-amdgpu" "libgl1-mesa-dri")
+            ;;
+        3)
+            echo "Verificando dependências para NVIDIA..."
+            pacotes=("nvidia-driver" "nvidia-settings" "nvidia-smi" "libgl1-nvidia-glx")
+            ;;
+        *)
+            echo "Opção inválida. Nenhuma dependência instalada."
+            return
+            ;;
+    esac
+
+    # Filtrar pacotes que já estão instalados
+    pacotes_faltando=()
+    for pacote in "${pacotes[@]}"; do
+        if ! dpkg -l | grep -qw "$pacote"; then
+            pacotes_faltando+=("$pacote")
+        fi
+    done
+
+    if [[ ${#pacotes_faltando[@]} -eq 0 ]]; then
+        echo "Todas as dependências já estão instaladas."
+    else
+        echo "Instalando os seguintes pacotes: ${pacotes_faltando[*]}"
+        sudo apt install -y "${pacotes_faltando[@]}"
+    fi
+}
+
+instalar_dependencias_graficas
