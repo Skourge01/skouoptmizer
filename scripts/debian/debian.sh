@@ -118,7 +118,49 @@ executar_irqbalance() {
         echo "Executando o script irqbalance Debian..."
         bash "$script_path"
     else
-        echo "Erro: O script irqbalance  não foi encontrado em $script_path."
+        echo "Erro: O script irqbalance.sh  não foi encontrado em $script_path."
     fi
 }
 executar_irqbalance
+executar_pipewire() {
+    # Obtém o diretório do script atual
+    local script_dir="$(dirname "$(readlink -f "$0")")"
+    # Define o caminho para o script do Debian
+    local script_path="${script_dir}/pipewire.sh"
+
+    if [[ -f "$script_path" ]]; then
+        echo "Executando o script pipewire.sh Debian..."
+        bash "$script_path"
+    else
+        echo "Erro: O script pipewire.sh  não foi encontrado em $script_path."
+    fi
+}
+executar_pipewire
+executar_stereo_mix_51() {
+    # Obtém o diretório do script atual
+    local script_dir="$(dirname "$(readlink -f "$0")")"
+    # Define o caminho para o script do Debian
+    local script_path="${script_dir}/stereo_mix_51.sh"
+
+    if [[ -f "$script_path" ]]; then
+        echo "Executando o script stereo_mix_51.sh Debian..."
+        bash "$script_path"
+    else
+        echo "Erro: O script stereo_mix_51.sh  não foi encontrado em $script_path."
+    fi
+}
+executar_stereo_mix_51
+executar_squeak_correction() {
+    # Obtém o diretório do script atual
+    local script_dir="$(dirname "$(readlink -f "$0")")"
+    # Define o caminho para o script do Debian
+    local script_path="${script_dir}/squeak_correction.sh"
+
+    if [[ -f "$script_path" ]]; then
+        echo "Executando o script squeak_correction.sh Debian..."
+        bash "$script_path"
+    else
+        echo "Erro: O script squeak_correction.sh  não foi encontrado em $script_path."
+    fi
+}
+executar_squeak_correction
