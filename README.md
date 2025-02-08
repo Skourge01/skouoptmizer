@@ -1,4 +1,4 @@
-1.728 / 5.000
+
 # skouoptmizer
 deep optimization script for archlinux
 
