@@ -70,14 +70,28 @@ executar_systemd_oomd() {
     # Obtém o diretório do script atual
     local script_dir="$(dirname "$(readlink -f "$0")")"
     # Define o caminho para o script do Debian
-    local script_path="${script_dir}/systemd_oomd..sh"
+    local script_path="${script_dir}/systemd_oomd.sh"
 
     if [[ -f "$script_path" ]]; then
         echo "Executando o script systemd_oomd.sh do Debian..."
         bash "$script_path"
     else
-        echo "Erro: O script systemd_oomdw
-        .sh do Debian não foi encontrado em $script_path."
+        echo "Erro: O script systemd_oomd.sh  não foi encontrado em $script_path."
     fi
 }
-executar_systemd_oomd
+executar_systemd_oomd 
+executar_ananicy_cpp() {
+    # Obtém o diretório do script atual
+    local script_dir="$(dirname "$(readlink -f "$0")")"
+    # Define o caminho para o script do Debian
+    local script_path="${script_dir}/systemd_oomd.sh"
+
+    if [[ -f "$script_path" ]]; then
+        echo "Executando o script ananicy_cpp.sh Debian..."
+        bash "$script_path"
+    else
+        echo "Erro: O script ananicy_cpp.sh  não foi encontrado em $script_path."
+    fi
+}
+executar_ananicy_cpp
+
