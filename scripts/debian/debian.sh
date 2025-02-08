@@ -52,3 +52,17 @@ executar_systemd_initramfs() {
     fi
 }
 executar_systemd_initramfs
+executar_initramfs_lz4() {
+    # Obtém o diretório do script atual
+    local script_dir="$(dirname "$(readlink -f "$0")")"
+    # Define o caminho para o script do Debian
+    local script_path="${script_dir}/initramfs_lz4.sh"
+
+    if [[ -f "$script_path" ]]; then
+        echo "Executando o script initramfs_lz4.sh do Debian..."
+        bash "$script_path"
+    else
+        echo "Erro: O script initramfs_lz4.sh do Debian não foi encontrado em $script_path."
+    fi
+}
+executar_initramfs_lz4
