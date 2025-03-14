@@ -8,7 +8,7 @@ the script uses as a base [information from ARU](https://github.com/ventureoo/AR
 which are
 - [ananicy](https://github.com/Skourge01/skouoptmizer/wiki/Ananicy%E2%80%90cpp)
 - [glvariables](https://github.com/Skourge01/skouoptmizer/wiki/glvariables)
-- graphicaldepencences
+- [graphicaldepencences](https://github.com/Skourge01/skouoptmizer/wiki/graphical-dependences)
 - initramfs_lz4
 - multilib
 - pipewire
