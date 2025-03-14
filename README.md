@@ -6,7 +6,7 @@ deep optimization script for archlinux
 the script uses as a base [information from ARU](https://github.com/ventureoo/ARU)
 - it uses some optimizations that it makes available for archlinux
 which are
-- ananicy
+- [ananicy](https://github.com/Skourge01/skouoptmizer/wiki/Ananicy%E2%80%90cpp)
 - glvariables
 - graphicaldepencences
 - initramfs_lz4
