@@ -17,7 +17,7 @@ which are
 - systemd_initramfs
 - trim
 ## Another warning:
-- everything listed will be activated with s/n and a check, so it is up to the user to decide whether to activate it or not
+- everything listed will be activated with y/n and a check, so it is up to the user to decide whether to activate it or not
 - I recommend that you see what each optimization does before wanting to activate them (check the source code for this)
 
 ## for debian
