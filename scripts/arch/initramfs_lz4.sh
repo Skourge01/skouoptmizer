@@ -1,19 +1,20 @@
-#!/bin/bash 
-verificar_e_perguntar_initramfs_lz4() {
+#!/bin/bash
+
+check_and_prompt_initramfs_lz4() {
     if grep -q '^COMPRESSION="lz4"' /etc/mkinitcpio.conf && grep -q '^COMPRESSION_OPTIONS=(-9)' /etc/mkinitcpio.conf; then
-        echo "A compressão do initramfs já está configurada corretamente para lz4 (-9). Nenhuma alteração necessária."
+        echo "Initramfs compression is already correctly set to lz4 (-9). No changes needed."
         return
     fi
 
-    read -p "A compressão do initramfs não está configurada para lz4 (-9). Deseja configurar agora? (s/n) " resposta
-    if [[ "$resposta" =~ ^[Ss]$ ]]; then
-        echo "Configurando o mkinitcpio para usar lz4..."
+    read -p "Initramfs compression is not set to lz4 (-9). Do you want to configure it now? (y/n) " response
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+        echo "Configuring mkinitcpio to use lz4..."
         
-        # Substitui ou adiciona as configurações de compressão
+        # Replace or add compression settings
         sudo sed -i 's/^COMPRESSION=.*/COMPRESSION="lz4"/' /etc/mkinitcpio.conf
         sudo sed -i 's/^COMPRESSION_OPTIONS=.*/COMPRESSION_OPTIONS=(-9)/' /etc/mkinitcpio.conf
 
-        # Caso as linhas não existam, adiciona ao final do arquivo
+        # If the lines do not exist, add them to the end of the file
         if ! grep -q '^COMPRESSION="lz4"' /etc/mkinitcpio.conf; then
             echo 'COMPRESSION="lz4"' | sudo tee -a /etc/mkinitcpio.conf > /dev/null
         fi
@@ -21,12 +22,13 @@ verificar_e_perguntar_initramfs_lz4() {
             echo 'COMPRESSION_OPTIONS=(-9)' | sudo tee -a /etc/mkinitcpio.conf > /dev/null
         fi
 
-        echo "Atualizando initramfs..."
+        echo "Updating initramfs..."
         sudo mkinitcpio -P
 
-        echo "Configuração concluída!"
+        echo "Configuration completed!"
     else
-        echo "Configuração não aplicada."
+        echo "Configuration not applied."
     fi
 }
-verificar_e_perguntar_initramfs_lz4 
+
+check_and_prompt_initramfs_lz4

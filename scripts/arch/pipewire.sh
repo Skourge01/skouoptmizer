@@ -1,71 +1,72 @@
 #!/bin/bash
-instalar_pipewire() {
-    # Verifica se os pacotes já estão instalados
+
+install_pipewire() {
+    # Check if the packages are already installed
     if pacman -Qs pipewire-jack lib32-pipewire gst-plugin-pipewire realtime-privileges rtkit > /dev/null; then
-        echo "Pipewire e seus componentes já estão instalados."
+        echo "Pipewire and its components are already installed."
     else
-        read -p "Deseja instalar o Pipewire e seus componentes adicionais? (s/n) " resposta
-        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+        read -p "Do you want to install Pipewire and its additional components? (y/n) " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
             sudo pacman -S pipewire-jack lib32-pipewire gst-plugin-pipewire realtime-privileges rtkit
-            echo "Pipewire e seus componentes foram instalados com sucesso."
+            echo "Pipewire and its components have been successfully installed."
         else
-            echo "Operação cancelada."
+            echo "Operation canceled."
             return
         fi
     fi
 
-    # Verifica se os serviços já estão ativos e habilitados
+    # Check if the services are already enabled and running
     if systemctl --user is-enabled --quiet pipewire && systemctl --user is-active --quiet pipewire && \
        systemctl --user is-enabled --quiet pipewire-pulse && systemctl --user is-active --quiet pipewire-pulse && \
        systemctl --user is-enabled --quiet wireplumber && systemctl --user is-active --quiet wireplumber; then
-        echo "Os serviços do Pipewire já estão ativos e habilitados."
+        echo "Pipewire services are already enabled and running."
     else
-        read -p "Deseja ativar os serviços do Pipewire? (s/n) " resposta
-        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+        read -p "Do you want to enable Pipewire services? (y/n) " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
             systemctl --user enable --now pipewire pipewire-pulse wireplumber
-            echo "Serviços do Pipewire ativados."
+            echo "Pipewire services enabled."
         else
-            echo "Operação cancelada."
+            echo "Operation canceled."
         fi
     fi
 
-    # Verifica se o usuário já está no grupo realtime
+    # Check if the user is already in the realtime group
     if groups "$USER" | grep -qw "realtime"; then
-        echo "O usuário já faz parte do grupo realtime."
+        echo "The user is already part of the realtime group."
     else
-        read -p "Deseja adicionar o usuário ao grupo realtime para melhor desempenho? (s/n) " resposta
-        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+        read -p "Do you want to add the user to the realtime group for better performance? (y/n) " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
             sudo usermod -aG realtime "$USER"
-            echo "Usuário adicionado ao grupo realtime. Faça logout ou reinicie para aplicar as mudanças."
+            echo "User added to the realtime group. Log out or restart to apply changes."
         else
-            echo "Operação cancelada."
+            echo "Operation canceled."
         fi
     fi
 }
 
-configurar_pipewire() {
-    # Diretório e caminho do arquivo de configuração
+configure_pipewire() {
+    # Configuration directory and file path
     conf_dir="$HOME/.config/pipewire/pipewire.conf.d"
     conf_file="$conf_dir/10-no-resampling.conf"
 
-    # Criar diretório caso não exista
+    # Create directory if it does not exist
     if [ ! -d "$conf_dir" ]; then
         mkdir -p "$conf_dir"
     fi
 
-    # Verifica se o arquivo de configuração já contém as propriedades corretas
+    # Check if the configuration file already contains the correct properties
     if [ -f "$conf_file" ] && grep -q "default.clock.rate = 48000" "$conf_file" && grep -q "default.clock.allowed-rates = \[ 44100 48000 96000 192000 \]" "$conf_file"; then
-        echo "As configurações do Pipewire já estão aplicadas."
+        echo "Pipewire settings are already applied."
     else
-        read -p "Deseja melhorar a qualidade do som do Pipewire? (s/n) " resposta
-        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+        read -p "Do you want to improve Pipewire sound quality? (y/n) " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
             echo -e "context.properties = {\n   default.clock.rate = 48000\n   default.clock.allowed-rates = [ 44100 48000 96000 192000 ]\n}" > "$conf_file"
-            echo "Configurações de qualidade do Pipewire aplicadas."
+            echo "Pipewire sound quality settings applied."
         else
-            echo "Operação cancelada."
+            echo "Operation canceled."
         fi
     fi
 }
 
-instalar_pipewire
-configurar_pipewire
+install_pipewire
+configure_pipewire

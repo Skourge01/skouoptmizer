@@ -1,13 +1,13 @@
 #!/bin/bash
-#skouoptmizer vai dizer sim ou nao para as otimizacoes mais rapidas do sistema, o verdadeiro archlinux 
-verificar_figlet(){
+
+verificar_figlet(){ # verify figlet 
     if ! command -v figlet &> /dev/null; then
         sudo pacman -S --noconfirm figlet &> /dev/null
     fi
 }
 
-# Função genérica para executar scripts
-executar_script() {
+
+executar_script() { # execute script 
     local nome_script="$1"
     # Obtém o diretório do script atual
     local script_dir="$(dirname "$(readlink -f "$0")")"
@@ -22,14 +22,13 @@ executar_script() {
     fi
 }
 
-# Execução principal
+
 verificar_figlet
 figlet Skouoptmizer
 
-# Lista de scripts para executar
+# script list to execute 
 scripts=(
     "multilib"
-    "reflectorsync"
     "graphicaldependences"
     "glvariables"
     "initramfs_lz4"
@@ -43,9 +42,9 @@ scripts=(
     "squeak_correction"
 )
 
-# Executa cada script
+# execute scripts 
 for script in "${scripts[@]}"; do
     executar_script "$script"
 done
-
+# uninstall figlet 
 sudo pacman -Rns figlet

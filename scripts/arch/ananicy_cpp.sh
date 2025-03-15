@@ -1,49 +1,55 @@
 #!/bin/bash
-instalar_ananicy_cpp() {
-    # Verifica se o ananicy-cpp está instalado
+
+install_ananicy_cpp() {
+    # Check if ananicy-cpp is installed
     if pacman -Qs ananicy-cpp > /dev/null; then
-        echo "ananicy-cpp já está instalado."
+        echo "ananicy-cpp is already installed."
     else
-        read -p "Deseja instalar o ananicy-cpp? (s/n) " resposta
-        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+        read -p "Do you want to install ananicy-cpp? (y/n) " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
             sudo pacman -S ananicy-cpp
-            echo "ananicy-cpp instalado com sucesso."
+            echo "ananicy-cpp installed successfully."
         else
-            echo "Operação cancelada."
+            echo "Operation canceled."
             return
         fi
     fi
 
-    # Verifica se o serviço ananicy-cpp está habilitado e ativo
+    # Check if the ananicy-cpp service is enabled and active
     if systemctl is-enabled --quiet ananicy-cpp && systemctl is-active --quiet ananicy-cpp; then
-        echo "O serviço ananicy-cpp já está habilitado e ativo."
+        echo "The ananicy-cpp service is already enabled and active."
     else
-        read -p "Deseja ativar o serviço ananicy-cpp? (s/n) " resposta
-        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+        read -p "Do you want to enable the ananicy-cpp service? (y/n) " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
             sudo systemctl enable --now ananicy-cpp
-            echo "O serviço ananicy-cpp foi ativado com sucesso."
+            echo "The ananicy-cpp service has been successfully activated."
         else
-            echo "Operação cancelada."
+            echo "Operation canceled."
         fi
     fi
 
-    # Verifica se as regras adicionais já estão instaladas
+    # Check if additional rules are installed
     if pacman -Qs cachyos-ananicy-rules-git > /dev/null; then
-        echo "As regras adicionais do ananicy-cpp já estão instaladas."
+        echo "Additional ananicy-cpp rules are already installed."
     else
-        read -p "Deseja instalar as regras adicionais do ananicy-cpp? (s/n) " resposta
-        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+        read -p "Do you want to install additional ananicy-cpp rules? (y/n) " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
             git clone https://aur.archlinux.org/cachyos-ananicy-rules-git.git
-            cd cachyos-ananicy-rules-git
-            makepkg -sric
-            cd ..
-            rm -rf cachyos-ananicy-rules-git
-            sudo systemctl restart ananicy-cpp
-            echo "Regras adicionais do ananicy-cpp instaladas e serviço reiniciado."
+            if [[ -d cachyos-ananicy-rules-git ]]; then
+                cd cachyos-ananicy-rules-git
+                makepkg -sric
+                cd ..
+                rm -rf cachyos-ananicy-rules-git
+                sudo systemctl restart ananicy-cpp
+                echo "Additional ananicy-cpp rules installed and service restarted."
+            else
+                echo "Error: Failed to clone repository."
+            fi
         else
-            echo "Operação cancelada."
+            echo "Operation canceled."
         fi
     fi
 }
 
-instalar_ananicy_cpp
+# Run the function
+install_ananicy_cpp

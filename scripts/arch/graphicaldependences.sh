@@ -1,45 +1,45 @@
 #!/bin/bash
 
-instalar_dependencias_graficas() {
-    echo "Escolha a placa gráfica para instalar as dependências:"
+install_graphics_dependencies() {
+    echo "Choose the graphics card to install dependencies:"
     echo "1. Intel"
     echo "2. AMD"
     echo "3. NVIDIA"
-    read -p "Digite o número da opção desejada (1/2/3): " opcao
+    read -p "Enter the number of the desired option (1/2/3): " option
 
-    case $opcao in
+    case $option in
         1)
-            echo "Verificando dependências para Intel..."
-            pacotes=("mesa" "lib32-mesa" "vulkan-intel" "lib32-vulkan-intel" "opencl-rusticl-mesa" "lib32-opencl-rusticl-mesa")
+            echo "Checking dependencies for Intel..."
+            packages=("mesa" "lib32-mesa" "vulkan-intel" "lib32-vulkan-intel" "opencl-rusticl-mesa" "lib32-opencl-rusticl-mesa")
             ;;
         2)
-            echo "Verificando dependências para AMD..."
-            pacotes=("mesa" "lib32-mesa" "vulkan-radeon" "lib32-vulkan-radeon" "vulkan-mesa-layers" "opencl-rusticl-mesa" "lib32-opencl-rusticl-mesa")
+            echo "Checking dependencies for AMD..."
+            packages=("mesa" "lib32-mesa" "vulkan-radeon" "lib32-vulkan-radeon" "vulkan-mesa-layers" "opencl-rusticl-mesa" "lib32-opencl-rusticl-mesa")
             ;;
         3)
-            echo "Verificando dependências para NVIDIA..."
-            pacotes=("nvidia-open-dkms" "nvidia-utils" "lib32-nvidia-utils" "nvidia-settings" "lib32-opencl-nvidia" "opencl-nvidia" "libxnvctrl" "lib32-vulkan-icd-loader" "libva-nvidia-driver")
+            echo "Checking dependencies for NVIDIA..."
+            packages=("nvidia-open-dkms" "nvidia-utils" "lib32-nvidia-utils" "nvidia-settings" "lib32-opencl-nvidia" "opencl-nvidia" "libxnvctrl" "lib32-vulkan-icd-loader" "libva-nvidia-driver")
             ;;
         *)
-            echo "Opção inválida. Nenhuma dependência instalada."
+            echo "Invalid option. No dependencies installed."
             return
             ;;
     esac
 
-    # Filtrar pacotes que já estão instalados
-    pacotes_faltando=()
-    for pacote in "${pacotes[@]}"; do
-        if ! pacman -Q "$pacote" &>/dev/null; then
-            pacotes_faltando+=("$pacote")
+    # Filter packages that are not installed
+    missing_packages=()
+    for package in "${packages[@]}"; do
+        if ! pacman -Q "$package" &>/dev/null; then
+            missing_packages+=("$package")
         fi
     done
 
-    if [[ ${#pacotes_faltando[@]} -eq 0 ]]; then
-        echo "Todas as dependências já estão instaladas."
+    if [[ ${#missing_packages[@]} -eq 0 ]]; then
+        echo "All dependencies are already installed."
     else
-        echo "Instalando os seguintes pacotes: ${pacotes_faltando[*]}"
-        sudo pacman -S "${pacotes_faltando[@]}"
+        echo "Installing the following packages: ${missing_packages[*]}"
+        sudo pacman -S "${missing_packages[@]}"
     fi
 }
 
-instalar_dependencias_graficas
+install_graphics_dependencies

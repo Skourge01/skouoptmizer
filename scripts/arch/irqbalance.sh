@@ -1,19 +1,21 @@
 #!/bin/bash
-verificar_e_ativar_irqbalance() {
-    # Verificar se o serviço irqbalance está em execução
+
+check_and_enable_irqbalance() {
+    # Check if the irqbalance service is running
     if systemctl is-active --quiet irqbalance; then
-        echo "irqbalance já está em execução."
+        echo "irqbalance is already running."
         return
     fi
     
-    # Perguntar ao usuário se deseja ativar o irqbalance
-    read -p "O serviço irqbalance não está em execução. Deseja ativá-lo? (s/n) " resposta
-    if [[ "$resposta" =~ ^[Ss]$ ]]; then
+    # Ask the user if they want to enable irqbalance
+    read -p "The irqbalance service is not running. Do you want to enable it? (y/n) " response
+    if [[ "$response" =~ ^[Yy]$ ]]; then
         sudo pacman -S irqbalance
         sudo systemctl enable --now irqbalance
-        echo "irqbalance foi instalado e ativado com sucesso."
+        echo "irqbalance has been successfully installed and enabled."
     else
-        echo "Operação cancelada. irqbalance não foi ativado."
+        echo "Operation canceled. irqbalance was not enabled."
     fi
 }
-verificar_e_ativar_irqbalance
+
+check_and_enable_irqbalance

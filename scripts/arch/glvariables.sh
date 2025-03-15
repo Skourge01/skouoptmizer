@@ -1,4 +1,4 @@
-verificar_e_adicionar_variaveis_gl() {
+verificar_e_adicionar_variaveis_gl() { # verify and add glvariables
     local env_file="/etc/environment"
     declare -A variaveis=(
         ["__GL_THREADED_OPTIMIZATIONS"]="1"
@@ -7,7 +7,6 @@ verificar_e_adicionar_variaveis_gl() {
         ["__GL_SHADER_DISK_CACHE_SKIP_CLEANUP"]="1"
     )
 
-    # Verifica quais variáveis já existem
     faltando=()
     for var in "${!variaveis[@]}"; do
         if ! grep -q "^$var=" "$env_file"; then
@@ -15,34 +14,34 @@ verificar_e_adicionar_variaveis_gl() {
         fi
     done
 
-    # Se todas as variáveis já existem, sai da função
+    # If all variables already exist, exit the function 
     if [[ ${#faltando[@]} -eq 0 ]]; then
-        echo "gl variables: configurado"
+        echo "glvariables configured"
         return
     fi
 
-    # Pergunta antes de adicionar
-    read -p "Deseja adicionar as variáveis de ambiente para otimização gráfica? (sim/nao): " resposta
-    if [[ "$resposta" == "sim" ]]; then
-        echo "Adicionando variáveis ao /etc/environment..."
+    # Question before adding 
+    read -p "Do you want to add environment variables for graphics optimization? (y/n): " resposta
+    if [[ "$resposta" == "y" ]]; then
+        echo "adding varibles to /etc/environment..."
         for var in "${faltando[@]}"; do
             echo "$var" | sudo tee -a "$env_file" > /dev/null
         done
 
-        # Detecta o monitor e adiciona "__GL_SYNC_DISPLAY_DEVICE" se ainda não existir
+        # Detects the monitor and adds "__GL_SYNC_DISPLAY_DEVICE" if it doesn't already exist
         if ! grep -q "^__GL_SYNC_DISPLAY_DEVICE=" "$env_file"; then
             monitor=$(xrandr --query | grep " connected" | awk '{print $1}' | head -n 1)
             if [[ -n "$monitor" ]]; then
-                echo "Detectado monitor principal: $monitor"
+                echo "Primary monitor detected: $monitor"
                 echo "__GL_SYNC_DISPLAY_DEVICE=$monitor" | sudo tee -a "$env_file" > /dev/null
             else
-                echo "Não foi possível detectar o monitor automaticamente. Configure manualmente se necessário."
+                echo "Unable to detect monitor automatically. Please configure manually if necessary."
             fi
         fi
 
-        echo "Variáveis de ambiente adicionadas com sucesso!"
+        echo "Environment variables added successfully!"
     else
-        echo "As variáveis de ambiente não foram adicionadas."
+        echo "Environment variables not added."
     fi
 }
 
