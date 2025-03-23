@@ -1,22 +1,21 @@
 verificar_e_perguntar_systemd_initramfs() {
     if grep -q '^HOOKS=(.*systemd.*)' /etc/mkinitcpio.conf; then
-        echo "O Systemd já está configurado no initramfs. Nenhuma alteração necessária."
+        echo "Systemd is already configured in the initramfs. No changes needed."
         return
     fi
 
-    read -p "O Systemd não está configurado no initramfs. Deseja configurar agora? (s/n) " resposta
-    if [[ "$resposta" =~ ^[Ss]$ ]]; then
-        echo "Configurando o mkinitcpio para usar o Systemd..."
+    read -p "Systemd is not configured in the initramfs. Do you want to configure it now? (y/n) " resposta
+    if [[ "$resposta" =~ ^[Yy]$ ]]; then
+        echo "Configuring mkinitcpio to use Systemd..."
 
-        # Substitui HOOKS pelo novo valor
-        sudo sed -i 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode modconf kms keyboard sd-vconsole block filesystems fsck)/' /etc/mkinitcpio.conf
+        sudo sed -i 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode modconf kms keyboard sd-vconsole block filesystems fsck)/' /etc/mkinitcpio.conf || { echo "Failed to modify /etc/mkinitcpio.conf"; exit 1; }
 
-        echo "Atualizando initramfs..."
-        sudo mkinitcpio -P
+        echo "Updating initramfs..."
+        sudo mkinitcpio -P || { echo "Failed to update initramfs"; exit 1; }
 
-        echo "Configuração concluída!"
+        echo "Configuration completed!"
     else
-        echo "Configuração não aplicada."
+        echo "Configuration not applied."
     fi
 }
 verificar_e_perguntar_systemd_initramfs
