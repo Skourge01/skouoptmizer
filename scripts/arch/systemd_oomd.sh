@@ -1,18 +1,18 @@
 #!/bin/bash
-ativar_systemd_oomd() {
-    # Verifica se o systemd-oomd já está ativo
+enable_systemd_oomd() {
+    # Check if systemd-oomd is already active
     if systemctl is-active --quiet systemd-oomd; then
-        echo "systemd-oomd já está ativo."
+        echo "systemd-oomd is already active."
         return
     fi
 
-    # Pergunta se o usuário deseja ativar o systemd-oomd
-    read -p "Deseja ativar o systemd-oomd? (s/n) " resposta
-    if [[ "$resposta" =~ ^[Ss]$ ]]; then
+    # Ask the user if they want to enable systemd-oomd
+    read -p "Do you want to enable systemd-oomd? (y/n) " response
+    if [[ "$response" =~ ^[Yy]$ ]]; then
         sudo systemctl enable --now systemd-oomd
-        echo "systemd-oomd ativado com sucesso."
+        echo "systemd-oomd successfully enabled."
     else
-        echo "Operação cancelada."
+        echo "Operation canceled."
     fi
 }
-ativar_systemd_oomd 
+enable_systemd_oomd

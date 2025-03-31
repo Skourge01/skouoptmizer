@@ -2,9 +2,9 @@
 detect_distro_and_run() {
     if [ -f /etc/os-release ]; then
         . /etc/os-release
-        distro=${ID:-$ID_LIKE}  # Usa ID, mas se não existir, tenta ID_LIKE
+        distro=${ID:-$ID_LIKE}  # Uses ID, but if it doesn't exist, tries ID_LIKE
 
-        script_dir="$(dirname "$(realpath "$0")")"  # Obtém o diretório do script
+        script_dir="$(dirname "$(realpath "$0")")"  # Get the script directory 
 
         case "$distro" in
             arch)

@@ -1,40 +1,40 @@
 #!/bin/bash
-verificar_e_configurar_aparar() {
-    # Verificar se o sistema de arquivos BTRFS NÃO está em uso
+check_and_configure_trim() {
+    # Check if the BTRFS file system is NOT in use
     if lsblk -f | grep -q 'btrfs'; then
-        echo "Sistema de arquivos BTRFS detectado. Não será necessário executar o TRIM manualmente, pois o kernel 6.2 ou superior gerencia automaticamente."
+        echo "BTRFS file system detected. Manual TRIM is not necessary, as kernel 6.2 or later manages it automatically."
         return
     fi
     
-    # Verificar a versão do kernel
+    # Check the kernel version
     kernel_version=$(uname -r | cut -d'.' -f1,2)
     
     if [[ "$kernel_version" < "6.2" ]]; then
-        # Sistema de arquivos não BTRFS e kernel 6.2 ou inferior
-        echo "Sistema de arquivos não BTRFS ou kernel inferior a 6.2. Continuando com a configuração do fstrim."
+        # Non-BTRFS file system and kernel version 6.2 or lower
+        echo "Non-BTRFS file system or kernel version below 6.2. Proceeding with fstrim configuration."
         
-        # Verificar se o fstrim.timer já está em execução
+        # Check if fstrim.timer is already running
         if systemctl is-active --quiet fstrim.timer; then
-            echo "fstrim.timer já está em execução. Nenhuma ação necessária."
+            echo "fstrim.timer is already running. No action needed."
             return
         fi
         
-        # Pergunta se o usuário deseja habilitar o fstrim.timer ou executar manualmente
-        read -p "Deseja habilitar o fstrim.timer para limpeza automática semanal do SSD? (s/n) " resposta
-        if [[ "$resposta" =~ ^[Ss]$ ]]; then
+        # Ask the user if they want to enable fstrim.timer or run it manually
+        read -p "Do you want to enable fstrim.timer for automatic weekly SSD trimming? (y/n) " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
             sudo systemctl enable --now fstrim.timer
-            echo "fstrim.timer habilitado para execução automática semanal."
+            echo "fstrim.timer enabled for automatic weekly execution."
         else
-            read -p "Deseja executar o comando fstrim agora? (s/n) " resposta
-            if [[ "$resposta" =~ ^[Ss]$ ]]; then
+            read -p "Do you want to run fstrim manually now? (y/n) " response
+            if [[ "$response" =~ ^[Yy]$ ]]; then
                 sudo fstrim -v /
-                echo "fstrim executado manualmente."
+                echo "fstrim executed manually."
             else
-                echo "Operação cancelada."
+                echo "Operation canceled."
             fi
         fi
     else
-        echo "Kernel 6.2 ou superior detectado. TRIM é gerenciado automaticamente pelo kernel."
+        echo "Kernel 6.2 or later detected. TRIM is managed automatically by the kernel."
     fi
 }
-verificar_e_configurar_aparar
+check_and_configure_trim
