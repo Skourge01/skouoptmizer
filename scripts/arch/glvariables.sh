@@ -1,3 +1,12 @@
+check_xrandr() {
+    if command -v xrandr &> /dev/null; then
+        echo "xrandr installed"
+    else
+        echo "xrandr not installed, installing"
+        sudo pacman -S xorg-xrandr
+    fi
+}
+check_xrandr
 verificar_e_adicionar_variaveis_gl() { # verify and add glvariables
     local env_file="/etc/environment"
     declare -A variaveis=(
