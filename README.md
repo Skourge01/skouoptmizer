@@ -35,7 +35,7 @@ warning: check the approved distros
 - zram (tested)
 - swapfile (tested)
 ## Approved and supported distros
-arch (native
+arch (native)
 debian (unlikely)
 ## Optimization information:
 check: https://ventureo.codeberg.page/source/services.html
