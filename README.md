@@ -30,12 +30,12 @@ warning: check the approved distros
 ```
 ## Workflow recommendations
 - linux-zen (native)
-- linux (unlikely)
-- linux-lts (unlikely)
+- linux (tested)
+- linux-lts (native)
 - zram (tested)
-- swapfile (unlikely)
+- swapfile (tested)
 ## Approved and supported distros
-arch (native)
+arch (native
 debian (unlikely)
 ## Optimization information:
 check: https://ventureo.codeberg.page/source/services.html
